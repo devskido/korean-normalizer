@@ -1,5 +1,6 @@
 // File processing state
 let processedFiles = [];
+let isProcessingFolder = false;
 
 // DOM Elements
 const uploadArea = document.getElementById('uploadArea');
@@ -22,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // File upload events
     uploadArea.addEventListener('click', (e) => {
         // Only trigger file input if clicking on the upload area itself
-        if (e.target === uploadArea || uploadArea.contains(e.target)) {
+        if (e.target === uploadArea || (uploadArea.contains(e.target) && !e.target.closest('.actions'))) {
             fileInput.click();
         }
     });
@@ -85,6 +86,7 @@ function handleDrop(e) {
 function handleFileSelect(e) {
     const files = e.target.files;
     if (files.length > 0) {
+        isProcessingFolder = false;
         processFiles(files);
     }
     // Reset the input to avoid conflicts
@@ -99,6 +101,7 @@ function handleFolderSelect(e) {
         // Extract folder path from first file
         const folderPath = files[0].webkitRelativePath.split('/')[0];
         progressText.textContent = `Processing folder: ${folderPath}`;
+        isProcessingFolder = true;
         processFiles(files);
     }
     // Reset the input to avoid conflicts
@@ -227,18 +230,51 @@ function downloadFile(index) {
 
 // Download all files as ZIP
 async function downloadAll() {
-    // For simplicity, download files individually
-    // In production, you'd use a library like JSZip
-    for (let i = 0; i < processedFiles.length; i++) {
-        downloadFile(i);
-        // Small delay between downloads
-        await new Promise(resolve => setTimeout(resolve, 100));
+    if (isProcessingFolder && typeof JSZip !== 'undefined') {
+        // Create ZIP for folder downloads
+        const zip = new JSZip();
+        
+        for (const fileData of processedFiles) {
+            // Preserve folder structure in ZIP
+            const pathToUse = fileData.normalizedPath || fileData.normalizedName;
+            
+            // Read file content
+            const content = await fileData.originalFile.arrayBuffer();
+            zip.file(pathToUse, content);
+        }
+        
+        // Generate ZIP file
+        const zipBlob = await zip.generateAsync({
+            type: "blob",
+            compression: "DEFLATE",
+            compressionOptions: {
+                level: 6
+            }
+        });
+        
+        // Download ZIP
+        const url = URL.createObjectURL(zipBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'normalized_files.zip';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    } else {
+        // Download files individually for non-folder selections
+        for (let i = 0; i < processedFiles.length; i++) {
+            downloadFile(i);
+            // Small delay between downloads
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
     }
 }
 
 // Clear all files
 function clearAll() {
     processedFiles = [];
+    isProcessingFolder = false;
     fileList.innerHTML = '';
     downloadAllBtn.style.display = 'none';
     clearAllBtn.style.display = 'none';
