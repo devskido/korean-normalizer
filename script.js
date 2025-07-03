@@ -1,6 +1,7 @@
 // File processing state
 let processedFiles = [];
 let isProcessingFolder = false;
+let currentFolderName = '';
 
 // DOM Elements
 const uploadArea = document.getElementById('uploadArea');
@@ -100,6 +101,7 @@ function handleFolderSelect(e) {
         console.log(`Selected folder with ${files.length} files`);
         // Extract folder path from first file
         const folderPath = files[0].webkitRelativePath.split('/')[0];
+        currentFolderName = folderPath;
         progressText.textContent = `Processing folder: ${folderPath}`;
         isProcessingFolder = true;
         processFiles(files);
@@ -252,11 +254,13 @@ async function downloadAll() {
             }
         });
         
-        // Download ZIP
+        // Download ZIP with folder name
         const url = URL.createObjectURL(zipBlob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'normalized_files.zip';
+        // Normalize the folder name for the ZIP file
+        const normalizedFolderName = normalizeFileName(currentFolderName);
+        a.download = `${normalizedFolderName}.zip`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -275,6 +279,7 @@ async function downloadAll() {
 function clearAll() {
     processedFiles = [];
     isProcessingFolder = false;
+    currentFolderName = '';
     fileList.innerHTML = '';
     downloadAllBtn.style.display = 'none';
     clearAllBtn.style.display = 'none';
