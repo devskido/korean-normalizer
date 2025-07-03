@@ -96,14 +96,30 @@ function handleFileSelect(e) {
     const files = e.target.files;
     if (files.length > 0) {
         isProcessingFolder = false;
-        processFiles(files);
+        const filesArray = Array.from(files);
+        processFiles(filesArray);
     }
     // Reset the input to avoid conflicts
-    e.target.value = '';
+    setTimeout(() => {
+        e.target.value = '';
+    }, 100);
 }
 
 function handleFolderSelect(e) {
     const files = e.target.files;
+    console.log('handleFolderSelect called, files:', files);
+    console.log('Total files count:', files.length);
+    
+    // Debug: Log all files
+    for (let i = 0; i < files.length; i++) {
+        console.log(`File ${i + 1}:`, {
+            name: files[i].name,
+            path: files[i].webkitRelativePath,
+            size: files[i].size,
+            type: files[i].type
+        });
+    }
+    
     // Show folder structure info
     if (files.length > 0) {
         console.log(`Selected folder with ${files.length} files`);
@@ -112,14 +128,22 @@ function handleFolderSelect(e) {
         currentFolderName = folderPath;
         progressText.textContent = `Processing folder: ${folderPath}`;
         isProcessingFolder = true;
-        processFiles(files);
+        
+        // Convert FileList to Array before processing
+        const filesArray = Array.from(files);
+        console.log('Converted to array:', filesArray.length, 'files');
+        
+        processFiles(filesArray);
     }
-    // Reset the input to avoid conflicts
-    e.target.value = '';
+    // Reset the input to avoid conflicts - moved after processFiles
+    setTimeout(() => {
+        e.target.value = '';
+    }, 100);
 }
 
 // Main file processing function
 async function processFiles(files) {
+    console.log('processFiles called with', files.length, 'files');
     if (files.length === 0) return;
     
     // Show progress
