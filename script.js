@@ -4,11 +4,13 @@ let processedFiles = [];
 // DOM Elements
 const uploadArea = document.getElementById('uploadArea');
 const fileInput = document.getElementById('fileInput');
+const folderInput = document.getElementById('folderInput');
 const fileList = document.getElementById('fileList');
 const progressContainer = document.getElementById('progressContainer');
 const progressFill = document.getElementById('progressFill');
 const progressText = document.getElementById('progressText');
 const actions = document.getElementById('actions');
+const selectFolderBtn = document.getElementById('selectFolder');
 const downloadAllBtn = document.getElementById('downloadAll');
 const clearAllBtn = document.getElementById('clearAll');
 const docModal = document.getElementById('docModal');
@@ -23,8 +25,10 @@ document.addEventListener('DOMContentLoaded', () => {
     uploadArea.addEventListener('dragleave', handleDragLeave);
     uploadArea.addEventListener('drop', handleDrop);
     fileInput.addEventListener('change', handleFileSelect);
+    folderInput.addEventListener('change', handleFolderSelect);
     
     // Button events
+    selectFolderBtn.addEventListener('click', () => folderInput.click());
     downloadAllBtn.addEventListener('click', downloadAll);
     clearAllBtn.addEventListener('click', clearAll);
     
@@ -71,6 +75,18 @@ function handleFileSelect(e) {
     processFiles(files);
 }
 
+function handleFolderSelect(e) {
+    const files = e.target.files;
+    // Show folder structure info
+    if (files.length > 0) {
+        console.log(`Selected folder with ${files.length} files`);
+        // Extract folder path from first file
+        const folderPath = files[0].webkitRelativePath.split('/')[0];
+        progressText.textContent = `Processing folder: ${folderPath}`;
+    }
+    processFiles(files);
+}
+
 // Main file processing function
 async function processFiles(files) {
     if (files.length === 0) return;
@@ -88,12 +104,22 @@ async function processFiles(files) {
         const file = files[i];
         const normalizedName = normalizeFileName(file.name);
         
+        // Handle folder path if present
+        let normalizedPath = file.name;
+        if (file.webkitRelativePath) {
+            const pathParts = file.webkitRelativePath.split('/');
+            const normalizedParts = pathParts.map(part => normalizeFileName(part));
+            normalizedPath = normalizedParts.join('/');
+        }
+        
         // Create processed file object
         const processedFile = {
             originalFile: file,
             originalName: file.name,
             normalizedName: normalizedName,
-            needsNormalization: file.name !== normalizedName,
+            originalPath: file.webkitRelativePath || file.name,
+            normalizedPath: normalizedPath,
+            needsNormalization: file.name !== normalizedName || (file.webkitRelativePath && file.webkitRelativePath !== normalizedPath),
             size: file.size
         };
         
@@ -109,10 +135,11 @@ async function processFiles(files) {
         await new Promise(resolve => setTimeout(resolve, 10));
     }
     
-    // Hide progress and show actions
+    // Hide progress and show action buttons
     progressContainer.style.display = 'none';
     if (processedFiles.length > 0) {
-        actions.style.display = 'flex';
+        downloadAllBtn.style.display = 'inline-flex';
+        clearAllBtn.style.display = 'inline-flex';
     }
 }
 
@@ -130,14 +157,18 @@ function displayFile(fileData) {
     const statusIcon = fileData.needsNormalization ? '✅' : '➖';
     const statusText = fileData.needsNormalization ? 'Normalized' : 'No change needed';
     
+    // Show full path if it's from a folder
+    const originalDisplay = fileData.originalPath || fileData.originalName;
+    const normalizedDisplay = fileData.normalizedPath || fileData.normalizedName;
+    
     fileItem.innerHTML = `
         <div class="file-item-header">
             <div class="file-info">
                 <div class="file-name original">
-                    <strong>Original:</strong> ${escapeHtml(fileData.originalName)}
+                    <strong>Original:</strong> ${escapeHtml(originalDisplay)}
                 </div>
                 <div class="file-name normalized">
-                    <strong>Normalized:</strong> ${escapeHtml(fileData.normalizedName)}
+                    <strong>Normalized:</strong> ${escapeHtml(normalizedDisplay)}
                 </div>
                 <div class="file-size">
                     ${formatFileSize(fileData.size)} · ${statusIcon} ${statusText}
@@ -191,8 +222,10 @@ async function downloadAll() {
 function clearAll() {
     processedFiles = [];
     fileList.innerHTML = '';
-    actions.style.display = 'none';
+    downloadAllBtn.style.display = 'none';
+    clearAllBtn.style.display = 'none';
     fileInput.value = '';
+    folderInput.value = '';
 }
 
 // Tab switching

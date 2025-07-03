@@ -30,6 +30,7 @@
                 <!-- Upload Area -->
                 <div class="upload-area" id="uploadArea">
                     <input type="file" id="fileInput" multiple hidden>
+                    <input type="file" id="folderInput" webkitdirectory multiple hidden>
                     <div class="upload-icon">📁</div>
                     <p class="upload-text">
                         <span class="ko">파일을 여기에 드래그하거나 클릭하여 선택하세요</span><br>
@@ -53,12 +54,16 @@
                 <div class="file-list" id="fileList"></div>
 
                 <!-- Action Buttons -->
-                <div class="actions" id="actions" style="display: none;">
-                    <button class="btn btn-primary" id="downloadAll">
+                <div class="actions" id="actions">
+                    <button class="btn btn-primary" id="selectFolder">
+                        <span class="ko">폴더 선택</span>
+                        <span class="en">Select Folder</span>
+                    </button>
+                    <button class="btn btn-primary" id="downloadAll" style="display: none;">
                         <span class="ko">모두 다운로드</span>
                         <span class="en">Download All</span>
                     </button>
-                    <button class="btn btn-secondary" id="clearAll">
+                    <button class="btn btn-secondary" id="clearAll" style="display: none;">
                         <span class="ko">초기화</span>
                         <span class="en">Clear</span>
                     </button>
