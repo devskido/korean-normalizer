@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Korean File Name Normalizer | 한글 파일명 정규화 도구</title>
+    <meta name="description" content="NFD에서 NFC로 한글 파일명을 변환하는 무료 온라인 도구. Convert Korean file names from NFD to NFC encoding.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>
+                <span class="ko">한글 파일명 정규화 도구</span>
+                <span class="en">Korean File Name Normalizer</span>
+            </h1>
+            <p class="subtitle">
+                <span class="ko">NFD에서 NFC로 파일명을 쉽게 변환하세요</span>
+                <span class="en">Convert file names from NFD to NFC encoding easily</span>
+            </p>
+        </header>
+
+        <!-- Main Application -->
+        <main>
+            <section class="app-section">
+                <!-- Upload Area -->
+                <div class="upload-area" id="uploadArea">
+                    <input type="file" id="fileInput" multiple hidden>
+                    <div class="upload-icon">📁</div>
+                    <p class="upload-text">
+                        <span class="ko">파일을 여기에 드래그하거나 클릭하여 선택하세요</span><br>
+                        <span class="en">Drag files here or click to select</span>
+                    </p>
+                    <p class="upload-hint">
+                        <span class="ko">여러 파일을 동시에 처리할 수 있습니다</span><br>
+                        <span class="en">You can process multiple files at once</span>
+                    </p>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="progress-container" id="progressContainer" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <p class="progress-text" id="progressText">Processing...</p>
+                </div>
+
+                <!-- File List -->
+                <div class="file-list" id="fileList"></div>
+
+                <!-- Action Buttons -->
+                <div class="actions" id="actions" style="display: none;">
+                    <button class="btn btn-primary" id="downloadAll">
+                        <span class="ko">모두 다운로드</span>
+                        <span class="en">Download All</span>
+                    </button>
+                    <button class="btn btn-secondary" id="clearAll">
+                        <span class="ko">초기화</span>
+                        <span class="en">Clear</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Information Tabs -->
+            <section class="info-section">
+                <div class="tabs">
+                    <button class="tab-button active" data-tab="about">
+                        <span class="ko">소개</span>
+                        <span class="en">About</span>
+                    </button>
+                    <button class="tab-button" data-tab="how">
+                        <span class="ko">사용법</span>
+                        <span class="en">How to Use</span>
+                    </button>
+                    <button class="tab-button" data-tab="faq">
+                        <span class="ko">FAQ</span>
+                        <span class="en">FAQ</span>
+                    </button>
+                    <button class="tab-button" data-tab="docs">
+                        <span class="ko">문서</span>
+                        <span class="en">Docs</span>
+                    </button>
+                </div>
+
+                <div class="tab-content">
+                    <!-- About Tab -->
+                    <div class="tab-pane active" id="about">
+                        <h2>
+                            <span class="ko">NFD/NFC 인코딩이란?</span>
+                            <span class="en">What is NFD/NFC Encoding?</span>
+                        </h2>
+                        <p>
+                            <span class="ko">macOS는 한글 파일명을 NFD(Normalized Form Decomposed) 형식으로 저장하는 반면, Windows와 Linux는 NFC(Normalized Form Composed) 형식을 사용합니다. 이로 인해 시스템 간 파일을 전송할 때 한글 파일명이 깨져 보이는 문제가 발생합니다.</span>
+                        </p>
+                        <p>
+                            <span class="en">macOS stores Korean file names in NFD (Normalized Form Decomposed) format, while Windows and Linux use NFC (Normalized Form Composed) format. This causes Korean file names to appear broken when transferring files between systems.</span>
+                        </p>
+                        <div class="example-box">
+                            <h3>
+                                <span class="ko">예시</span>
+                                <span class="en">Example</span>
+                            </h3>
+                            <p><strong>NFD:</strong> ㅎㅏㄴㄱㅡㄹ.txt (분해된 형태)</p>
+                            <p><strong>NFC:</strong> 한글.txt (조합된 형태)</p>
+                        </div>
+                    </div>
+
+                    <!-- How to Use Tab -->
+                    <div class="tab-pane" id="how">
+                        <h2>
+                            <span class="ko">사용 방법</span>
+                            <span class="en">How to Use</span>
+                        </h2>
+                        <ol class="steps">
+                            <li>
+                                <span class="ko">파일 선택: 업로드 영역을 클릭하거나 파일을 드래그 앤 드롭하세요.</span>
+                                <span class="en">Select Files: Click the upload area or drag and drop files.</span>
+                            </li>
+                            <li>
+                                <span class="ko">변환 확인: 원본 파일명과 변환된 파일명을 확인하세요.</span>
+                                <span class="en">Check Conversion: Review original and converted file names.</span>
+                            </li>
+                            <li>
+                                <span class="ko">다운로드: 개별 파일 또는 전체 파일을 다운로드하세요.</span>
+                                <span class="en">Download: Download individual files or all files at once.</span>
+                            </li>
+                        </ol>
+                        <div class="info-box">
+                            <p>
+                                <span class="ko">💡 팁: 모든 처리는 브라우저에서 이루어지므로 파일이 서버로 전송되지 않습니다.</span>
+                                <span class="en">💡 Tip: All processing happens in your browser, files are never sent to a server.</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- FAQ Tab -->
+                    <div class="tab-pane" id="faq">
+                        <h2>FAQ</h2>
+                        <div class="faq-item">
+                            <h3>
+                                <span class="ko">Q: 파일이 서버로 업로드되나요?</span>
+                                <span class="en">Q: Are files uploaded to a server?</span>
+                            </h3>
+                            <p>
+                                <span class="ko">A: 아니요. 모든 처리는 브라우저에서 로컬로 이루어집니다. 파일이 서버로 전송되지 않으므로 완전히 안전합니다.</span>
+                                <span class="en">A: No. All processing happens locally in your browser. Files are never sent to a server, ensuring complete privacy.</span>
+                            </p>
+                        </div>
+                        <div class="faq-item">
+                            <h3>
+                                <span class="ko">Q: 어떤 파일 형식을 지원하나요?</span>
+                                <span class="en">Q: What file types are supported?</span>
+                            </h3>
+                            <p>
+                                <span class="ko">A: 모든 파일 형식을 지원합니다. 파일 내용은 변경되지 않고 파일명만 변환됩니다.</span>
+                                <span class="en">A: All file types are supported. File contents remain unchanged, only the file name is converted.</span>
+                            </p>
+                        </div>
+                        <div class="faq-item">
+                            <h3>
+                                <span class="ko">Q: 한 번에 몇 개의 파일을 처리할 수 있나요?</span>
+                                <span class="en">Q: How many files can I process at once?</span>
+                            </h3>
+                            <p>
+                                <span class="ko">A: 브라우저 메모리가 허용하는 한 제한이 없습니다. 일반적으로 수백 개의 파일을 동시에 처리할 수 있습니다.</span>
+                                <span class="en">A: There's no hard limit, it depends on your browser's memory. Typically, you can process hundreds of files at once.</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Docs Tab -->
+                    <div class="tab-pane" id="docs">
+                        <h2>
+                            <span class="ko">프로젝트 문서</span>
+                            <span class="en">Project Documentation</span>
+                        </h2>
+                        <div class="docs-links">
+                            <a href="#" class="doc-link" data-doc="project-proposal">
+                                <h3>Project Proposal</h3>
+                                <p>프로젝트 제안서 - Project overview and objectives</p>
+                            </a>
+                            <a href="#" class="doc-link" data-doc="requirements-specification">
+                                <h3>Requirements Specification</h3>
+                                <p>요구사항 명세 - Functional and non-functional requirements</p>
+                            </a>
+                            <a href="#" class="doc-link" data-doc="technical-specification">
+                                <h3>Technical Specification</h3>
+                                <p>기술 명세 - System architecture and implementation details</p>
+                            </a>
+                            <a href="#" class="doc-link" data-doc="test-plan">
+                                <h3>Test Plan</h3>
+                                <p>테스트 계획 - Testing approach and test cases</p>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <p>
+                <span class="ko">오픈 소스 프로젝트</span>
+                <span class="en">Open Source Project</span>
+                · <a href="https://github.com/devskido/korean-normalizer" target="_blank">GitHub</a>
+            </p>
+        </footer>
+    </div>
+
+    <!-- Document Viewer Modal -->
+    <div class="modal" id="docModal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <div class="modal-body" id="docContent"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
