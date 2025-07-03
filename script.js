@@ -20,7 +20,12 @@ const modalClose = document.querySelector('.modal-close');
 // Initialize event listeners
 document.addEventListener('DOMContentLoaded', () => {
     // File upload events
-    uploadArea.addEventListener('click', () => fileInput.click());
+    uploadArea.addEventListener('click', (e) => {
+        // Only trigger file input if clicking on the upload area itself
+        if (e.target === uploadArea || uploadArea.contains(e.target)) {
+            fileInput.click();
+        }
+    });
     uploadArea.addEventListener('dragover', handleDragOver);
     uploadArea.addEventListener('dragleave', handleDragLeave);
     uploadArea.addEventListener('drop', handleDrop);
@@ -28,7 +33,10 @@ document.addEventListener('DOMContentLoaded', () => {
     folderInput.addEventListener('change', handleFolderSelect);
     
     // Button events
-    selectFolderBtn.addEventListener('click', () => folderInput.click());
+    selectFolderBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        folderInput.click();
+    });
     downloadAllBtn.addEventListener('click', downloadAll);
     clearAllBtn.addEventListener('click', clearAll);
     
