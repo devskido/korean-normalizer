@@ -155,7 +155,7 @@ async function processFiles(files) {
         };
         
         processedFiles.push(processedFile);
-        displayFile(processedFile);
+        displayFile(processedFile, processedFiles.length - 1);
         
         // Update progress
         const progress = ((i + 1) / files.length) * 100;
@@ -181,7 +181,7 @@ function normalizeFileName(fileName) {
 }
 
 // Display a processed file
-function displayFile(fileData) {
+function displayFile(fileData, index) {
     const fileItem = document.createElement('div');
     fileItem.className = 'file-item';
     
@@ -206,7 +206,7 @@ function displayFile(fileData) {
                 </div>
             </div>
             <div class="file-actions">
-                <button class="btn btn-primary btn-small" onclick="downloadFile(${processedFiles.length - 1})">
+                <button class="btn btn-primary btn-small" onclick="downloadFile(${index})">
                     Download
                 </button>
             </div>
