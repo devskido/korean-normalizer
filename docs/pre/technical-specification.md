@@ -153,15 +153,25 @@ function downloadFile(file, fileName) {
  * @param {NormalizedFile[]} files - Files to zip
  * @returns {Promise<void>}
  */
-async function downloadAsZip(files) {
-  // Implementation using JSZip or similar
+async function downloadAsZip(files, folderName) {
+  // Implementation using JSZip
   const zip = new JSZip();
+  
+  // For folder uploads, preserve directory structure
   files.forEach(file => {
-    zip.file(file.normalizedName, file.originalFile);
+    const pathToUse = file.normalizedPath || file.normalizedName;
+    zip.file(pathToUse, file.originalFile);
   });
   
-  const blob = await zip.generateAsync({ type: 'blob' });
-  downloadFile(blob, 'normalized_files.zip');
+  const blob = await zip.generateAsync({ 
+    type: 'blob',
+    compression: 'DEFLATE',
+    compressionOptions: { level: 6 }
+  });
+  
+  // Use folder name for ZIP file if available
+  const zipName = folderName ? `${folderName}.zip` : 'normalized_files.zip';
+  downloadFile(blob, zipName);
 }
 ```
 
@@ -193,6 +203,7 @@ async function downloadAsZip(files) {
       <div class="file-list" id="fileList"></div>
       
       <div class="actions">
+        <button id="selectFolder">폴더 선택 | Select Folder</button>
         <button id="downloadAll">모두 다운로드 | Download All</button>
         <button id="clear">초기화 | Clear</button>
       </div>
@@ -301,6 +312,26 @@ document.addEventListener('DOMContentLoaded', () => {
   const app = new App();
   app.init();
 });
+```
+
+#### Folder Upload Support
+```javascript
+// Handle folder selection
+function handleFolderSelect(e) {
+  const files = e.target.files;
+  if (files.length > 0) {
+    const folderPath = files[0].webkitRelativePath.split('/')[0];
+    currentFolderName = folderPath;
+    isProcessingFolder = true;
+    
+    // Process all files in folder
+    const filesArray = Array.from(files);
+    processFiles(filesArray);
+  }
+}
+
+// Folder button with webkitdirectory
+<input type="file" id="folderInput" webkitdirectory multiple hidden>
 ```
 
 #### normalizer.js - Normalization Logic

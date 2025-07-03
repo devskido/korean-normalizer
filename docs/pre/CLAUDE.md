@@ -43,13 +43,15 @@ normalizer/
 ## Current Work Status
 - [x] Project structure created
 - [x] Documentation files initialized
-- [ ] HTML interface implementation
-- [ ] CSS styling
-- [ ] JavaScript normalization logic
-- [ ] File upload/download functionality
-- [ ] Batch processing support
-- [ ] Error handling
-- [ ] Bilingual UI implementation
+- [x] HTML interface implementation
+- [x] CSS styling
+- [x] JavaScript normalization logic
+- [x] File upload/download functionality
+- [x] Batch processing support
+- [x] Folder upload support with webkitdirectory
+- [x] ZIP download for folders with JSZip
+- [x] Error handling
+- [x] Bilingual UI implementation
 - [ ] Cross-browser testing
 
 ## Known Issues & Considerations
@@ -99,6 +101,11 @@ downloadFile(file, newName) // Download with new name
 createZip(files) // Batch download as ZIP
 updateUI(status) // Update progress/status
 handleError(error) // User-friendly error display
+
+// Folder support
+handleFolderSelect(e) // Process folder selection
+processFolder(files) // Handle folder with structure
+downloadAsZip(files, folderName) // ZIP with folder name
 ```
 
 ## Future Enhancements

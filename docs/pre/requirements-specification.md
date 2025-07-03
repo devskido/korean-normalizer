@@ -22,6 +22,7 @@ The application will provide a web-based interface for users to upload files wit
 **Acceptance Criteria**:
 - Support drag-and-drop file upload
 - Support click-to-browse file selection
+- Support folder selection with "Select Folder" button
 - Accept files of any type and extension
 - Display selected files before processing
 - No file size limit imposed by the application (browser limits apply)
@@ -97,6 +98,19 @@ The application will provide a web-based interface for users to upload files wit
 - No file data sent to server
 - No file data logged or stored
 - Clear privacy notice displayed
+
+### 2.10 Folder Upload (FR-010)
+**Priority**: High  
+**Description**: The system shall allow users to upload entire folders with preserved structure  
+**Acceptance Criteria**:
+- Dedicated "Select Folder" button for folder selection
+- Support webkitdirectory attribute for folder uploads
+- Display full file paths including folder structure
+- Process all files within selected folder and subfolders
+- Maintain folder hierarchy in file display
+- Normalize folder names along with file names
+- Download entire folder as ZIP file preserving structure
+- ZIP file named after the uploaded folder name
 
 ## 3. Non-Functional Requirements
 
