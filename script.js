@@ -6,7 +6,6 @@ let currentFolderName = '';
 // DOM Elements
 const uploadArea = document.getElementById('uploadArea');
 const fileInput = document.getElementById('fileInput');
-const folderInput = document.getElementById('folderInput');
 const fileList = document.getElementById('fileList');
 const progressContainer = document.getElementById('progressContainer');
 const progressFill = document.getElementById('progressFill');
@@ -23,33 +22,27 @@ const modalClose = document.querySelector('.modal-close');
 document.addEventListener('DOMContentLoaded', () => {
     // File upload events
     uploadArea.addEventListener('click', (e) => {
-        // Only trigger file input if clicking on the upload area itself and not disabled
-        if ((e.target === uploadArea || (uploadArea.contains(e.target) && !e.target.closest('.actions'))) && !fileInput.disabled) {
+        // Only trigger file input if clicking on the upload area itself
+        if (e.target === uploadArea || uploadArea.contains(e.target)) {
+            // Remove webkitdirectory for file selection
+            fileInput.removeAttribute('webkitdirectory');
             fileInput.click();
         }
     });
     uploadArea.addEventListener('dragover', handleDragOver);
     uploadArea.addEventListener('dragleave', handleDragLeave);
     uploadArea.addEventListener('drop', handleDrop);
-    fileInput.addEventListener('change', handleFileSelect);
-    folderInput.addEventListener('change', handleFolderSelect);
+    fileInput.addEventListener('change', handleFileInputChange);
     
     // Button events
     selectFolderBtn.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        e.stopImmediatePropagation();
         
-        // Temporarily disable file input to prevent conflicts
-        fileInput.disabled = true;
-        
-        // Click folder input
-        folderInput.click();
-        
-        // Re-enable file input after a delay
-        setTimeout(() => {
-            fileInput.disabled = false;
-        }, 100);
+        // Add webkitdirectory for folder selection
+        fileInput.setAttribute('webkitdirectory', '');
+        fileInput.setAttribute('directory', '');
+        fileInput.click();
     });
     downloadAllBtn.addEventListener('click', downloadAll);
     clearAllBtn.addEventListener('click', clearAll);
@@ -92,30 +85,32 @@ function handleDrop(e) {
     processFiles(files);
 }
 
-function handleFileSelect(e) {
+function handleFileInputChange(e) {
     const files = e.target.files;
-    if (files.length > 0) {
-        isProcessingFolder = false;
-        processFiles(files);
-    }
-    // Reset the input to avoid conflicts
-    e.target.value = '';
-}
-
-function handleFolderSelect(e) {
-    const files = e.target.files;
-    // Show folder structure info
-    if (files.length > 0) {
+    if (files.length === 0) return;
+    
+    // Check if this is a folder selection
+    const isFolder = fileInput.hasAttribute('webkitdirectory');
+    
+    if (isFolder) {
         console.log(`Selected folder with ${files.length} files`);
         // Extract folder path from first file
         const folderPath = files[0].webkitRelativePath.split('/')[0];
         currentFolderName = folderPath;
         progressText.textContent = `Processing folder: ${folderPath}`;
         isProcessingFolder = true;
-        processFiles(files);
+    } else {
+        isProcessingFolder = false;
+        currentFolderName = '';
     }
-    // Reset the input to avoid conflicts
+    
+    processFiles(files);
+    
+    // Reset the input
     e.target.value = '';
+    // Remove webkitdirectory attribute after use
+    fileInput.removeAttribute('webkitdirectory');
+    fileInput.removeAttribute('directory');
 }
 
 // Main file processing function
@@ -292,7 +287,9 @@ function clearAll() {
     downloadAllBtn.style.display = 'none';
     clearAllBtn.style.display = 'none';
     fileInput.value = '';
-    folderInput.value = '';
+    // Remove any lingering attributes
+    fileInput.removeAttribute('webkitdirectory');
+    fileInput.removeAttribute('directory');
 }
 
 // Tab switching
