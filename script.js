@@ -34,8 +34,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Button events
     selectFolderBtn.addEventListener('click', (e) => {
+        e.preventDefault();
         e.stopPropagation();
-        folderInput.click();
+        // Use setTimeout to ensure the event loop is clear
+        setTimeout(() => {
+            folderInput.click();
+        }, 0);
     });
     downloadAllBtn.addEventListener('click', downloadAll);
     clearAllBtn.addEventListener('click', clearAll);
@@ -80,7 +84,11 @@ function handleDrop(e) {
 
 function handleFileSelect(e) {
     const files = e.target.files;
-    processFiles(files);
+    if (files.length > 0) {
+        processFiles(files);
+    }
+    // Reset the input to avoid conflicts
+    e.target.value = '';
 }
 
 function handleFolderSelect(e) {
@@ -91,8 +99,10 @@ function handleFolderSelect(e) {
         // Extract folder path from first file
         const folderPath = files[0].webkitRelativePath.split('/')[0];
         progressText.textContent = `Processing folder: ${folderPath}`;
+        processFiles(files);
     }
-    processFiles(files);
+    // Reset the input to avoid conflicts
+    e.target.value = '';
 }
 
 // Main file processing function
