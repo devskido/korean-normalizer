@@ -23,8 +23,8 @@ const modalClose = document.querySelector('.modal-close');
 document.addEventListener('DOMContentLoaded', () => {
     // File upload events
     uploadArea.addEventListener('click', (e) => {
-        // Only trigger file input if clicking on the upload area itself
-        if (e.target === uploadArea || (uploadArea.contains(e.target) && !e.target.closest('.actions'))) {
+        // Only trigger file input if clicking on the upload area itself and not disabled
+        if ((e.target === uploadArea || (uploadArea.contains(e.target) && !e.target.closest('.actions'))) && !fileInput.disabled) {
             fileInput.click();
         }
     });
@@ -38,10 +38,18 @@ document.addEventListener('DOMContentLoaded', () => {
     selectFolderBtn.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        // Use setTimeout to ensure the event loop is clear
+        e.stopImmediatePropagation();
+        
+        // Temporarily disable file input to prevent conflicts
+        fileInput.disabled = true;
+        
+        // Click folder input
+        folderInput.click();
+        
+        // Re-enable file input after a delay
         setTimeout(() => {
-            folderInput.click();
-        }, 0);
+            fileInput.disabled = false;
+        }, 100);
     });
     downloadAllBtn.addEventListener('click', downloadAll);
     clearAllBtn.addEventListener('click', clearAll);
