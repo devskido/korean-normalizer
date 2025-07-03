@@ -6,6 +6,7 @@ let currentFolderName = '';
 // DOM Elements
 const uploadArea = document.getElementById('uploadArea');
 const fileInput = document.getElementById('fileInput');
+const folderInput = document.getElementById('folderInput');
 const fileList = document.getElementById('fileList');
 const progressContainer = document.getElementById('progressContainer');
 const progressFill = document.getElementById('progressFill');
@@ -22,27 +23,33 @@ const modalClose = document.querySelector('.modal-close');
 document.addEventListener('DOMContentLoaded', () => {
     // File upload events
     uploadArea.addEventListener('click', (e) => {
-        // Only trigger file input if clicking on the upload area itself
-        if (e.target === uploadArea || uploadArea.contains(e.target)) {
-            // Remove webkitdirectory for file selection
-            fileInput.removeAttribute('webkitdirectory');
+        // Only trigger file input if clicking on the upload area itself and not disabled
+        if ((e.target === uploadArea || (uploadArea.contains(e.target) && !e.target.closest('.actions'))) && !fileInput.disabled) {
             fileInput.click();
         }
     });
     uploadArea.addEventListener('dragover', handleDragOver);
     uploadArea.addEventListener('dragleave', handleDragLeave);
     uploadArea.addEventListener('drop', handleDrop);
-    fileInput.addEventListener('change', handleFileInputChange);
+    fileInput.addEventListener('change', handleFileSelect);
+    folderInput.addEventListener('change', handleFolderSelect);
     
     // Button events
     selectFolderBtn.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
+        e.stopImmediatePropagation();
         
-        // Add webkitdirectory for folder selection
-        fileInput.setAttribute('webkitdirectory', '');
-        fileInput.setAttribute('directory', '');
-        fileInput.click();
+        // Temporarily disable file input to prevent conflicts
+        fileInput.disabled = true;
+        
+        // Click folder input
+        folderInput.click();
+        
+        // Re-enable file input after a delay
+        setTimeout(() => {
+            fileInput.disabled = false;
+        }, 100);
     });
     downloadAllBtn.addEventListener('click', downloadAll);
     clearAllBtn.addEventListener('click', clearAll);
@@ -85,32 +92,30 @@ function handleDrop(e) {
     processFiles(files);
 }
 
-function handleFileInputChange(e) {
+function handleFileSelect(e) {
     const files = e.target.files;
-    if (files.length === 0) return;
-    
-    // Check if this is a folder selection
-    const isFolder = fileInput.hasAttribute('webkitdirectory');
-    
-    if (isFolder) {
+    if (files.length > 0) {
+        isProcessingFolder = false;
+        processFiles(files);
+    }
+    // Reset the input to avoid conflicts
+    e.target.value = '';
+}
+
+function handleFolderSelect(e) {
+    const files = e.target.files;
+    // Show folder structure info
+    if (files.length > 0) {
         console.log(`Selected folder with ${files.length} files`);
         // Extract folder path from first file
         const folderPath = files[0].webkitRelativePath.split('/')[0];
         currentFolderName = folderPath;
         progressText.textContent = `Processing folder: ${folderPath}`;
         isProcessingFolder = true;
-    } else {
-        isProcessingFolder = false;
-        currentFolderName = '';
+        processFiles(files);
     }
-    
-    processFiles(files);
-    
-    // Reset the input
+    // Reset the input to avoid conflicts
     e.target.value = '';
-    // Remove webkitdirectory attribute after use
-    fileInput.removeAttribute('webkitdirectory');
-    fileInput.removeAttribute('directory');
 }
 
 // Main file processing function
@@ -287,9 +292,7 @@ function clearAll() {
     downloadAllBtn.style.display = 'none';
     clearAllBtn.style.display = 'none';
     fileInput.value = '';
-    // Remove any lingering attributes
-    fileInput.removeAttribute('webkitdirectory');
-    fileInput.removeAttribute('directory');
+    folderInput.value = '';
 }
 
 // Tab switching
