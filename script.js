@@ -15,9 +15,6 @@ const actions = document.getElementById('actions');
 const selectFolderBtn = document.getElementById('selectFolder');
 const downloadAllBtn = document.getElementById('downloadAll');
 const clearAllBtn = document.getElementById('clearAll');
-const docModal = document.getElementById('docModal');
-const docContent = document.getElementById('docContent');
-const modalClose = document.querySelector('.modal-close');
 
 // Initialize event listeners
 document.addEventListener('DOMContentLoaded', () => {
@@ -57,20 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Tab events
     document.querySelectorAll('.tab-button').forEach(button => {
         button.addEventListener('click', () => switchTab(button.dataset.tab));
-    });
-    
-    // Document link events
-    document.querySelectorAll('.doc-link').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            loadDocument(link.dataset.doc);
-        });
-    });
-    
-    // Modal events
-    modalClose.addEventListener('click', closeModal);
-    window.addEventListener('click', (e) => {
-        if (e.target === docModal) closeModal();
     });
 });
 
@@ -332,27 +315,6 @@ function switchTab(tabName) {
     });
 }
 
-// Load documentation
-async function loadDocument(docName) {
-    try {
-        const response = await fetch(`docs/pre/${docName}.md`);
-        if (!response.ok) throw new Error('Document not found');
-        
-        const markdown = await response.text();
-        const html = marked.parse(markdown);
-        
-        docContent.innerHTML = html;
-        docModal.style.display = 'block';
-    } catch (error) {
-        docContent.innerHTML = '<p>Error loading document.</p>';
-        docModal.style.display = 'block';
-    }
-}
-
-// Close modal
-function closeModal() {
-    docModal.style.display = 'none';
-}
 
 // Utility functions
 function escapeHtml(text) {
