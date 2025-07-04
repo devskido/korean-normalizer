@@ -34,38 +34,27 @@ body {
     padding: 1rem;
 }
 
-/* Header with Ad Layout */
-.header-wrapper {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 2rem;
-    align-items: start;
-    margin-bottom: 3rem;
-}
-
 /* Header */
 header {
     text-align: center;
     padding: 3rem 0 2rem;
     border-bottom: 1px solid var(--border);
+    margin-bottom: 3rem;
+}
+
+/* Content with Ad Layout */
+.content-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 180px;
+    gap: 2rem;
+    align-items: start;
 }
 
 /* Ad Sidebar */
 .ad-sidebar {
-    padding-top: 2rem;
     position: sticky;
     top: 1rem;
-}
-
-/* Responsive: Hide ad on smaller screens */
-@media (max-width: 1024px) {
-    .header-wrapper {
-        grid-template-columns: 1fr;
-    }
-    
-    .ad-sidebar {
-        display: none;
-    }
+    min-height: 600px;
 }
 
 h1 {
@@ -103,6 +92,17 @@ main {
 @media (min-width: 1024px) {
     main {
         grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* Responsive: Stack layout on smaller screens */
+@media (max-width: 1200px) {
+    .content-wrapper {
+        grid-template-columns: 1fr;
+    }
+    
+    .ad-sidebar {
+        display: none;
     }
 }
 
